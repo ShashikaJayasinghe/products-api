@@ -5,7 +5,6 @@ const PORT = 3000;
 
 app.use(express.json());
 
-// ✅ Helper functions for validation
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -14,7 +13,6 @@ function isValidCardNumber(cardNumber) {
   return /^\d{12}$/.test(cardNumber);
 }
 
-// ✅ POST /register-customer API
 app.post('/register-customer', (req, res) => {
   const {
     name,
@@ -29,7 +27,6 @@ app.post('/register-customer', (req, res) => {
     timestamp
   } = req.body;
 
-  // ✅ Validate required fields
   if (!name || !address || !email || !dateOfBirth || !age || !cardHolderName || !cardNumber || !expiryDate || !cvv || !timestamp) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
@@ -63,7 +60,6 @@ app.post('/register-customer', (req, res) => {
   });
 });
 
-// ✅ Start the server
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
