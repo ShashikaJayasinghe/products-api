@@ -1,20 +1,21 @@
-// server.js
 const express = require('express');
-const bodyParser = require('body-parser');
-const db = require('./database');
-
 const app = express();
-app.use(bodyParser.json());
+const db = require('./database');
+const PORT = 3000;
 
+app.use(express.json());
+
+// ✅ Helper functions for validation
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function isValidCardNumber(number) {
-  return /^\d{12}$/.test(number);
+function isValidCardNumber(cardNumber) {
+  return /^\d{12}$/.test(cardNumber);
 }
 
-app.post('/register', (req, res) => {
+// ✅ POST /register-customer API
+app.post('/register-customer', (req, res) => {
   const {
     name,
     address,
@@ -28,7 +29,11 @@ app.post('/register', (req, res) => {
     timestamp
   } = req.body;
 
-  // Validation
+  // ✅ Validate required fields
+  if (!name || !address || !email || !dateOfBirth || !age || !cardHolderName || !cardNumber || !expiryDate || !cvv || !timestamp) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
   if (!isValidEmail(email)) {
     return res.status(400).json({ error: 'Invalid email format' });
   }
@@ -37,38 +42,28 @@ app.post('/register', (req, res) => {
     return res.status(400).json({ error: 'Card number must be 12 digits' });
   }
 
-  // Insert into database
   const query = `
-    INSERT INTO customer
-    (name, address, email, dateOfBirth, age, cardHolderName, cardNumber, expiryDate, cvv, timestamp)
+    INSERT INTO customer 
+    (name, address, email, dateOfBirth, age, cardHolderName, cardNumber, expiryDate, cvv, timestamp) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  const values = [
-    name,
-    address,
-    email,
-    dateOfBirth,
-    age,
-    cardHolderName,
-    cardNumber,
-    expiryDate,
-    cvv,
-    timestamp
-  ];
+  const values = [name, address, email, dateOfBirth, age, cardHolderName, cardNumber, expiryDate, cvv, timestamp];
 
-  db.run(query, values, function (err) {
+  db.run(query, values, function(err) {
     if (err) {
-      return res.status(400).json({ error: err.message });
+      console.error(err.message);
+      return res.status(400).json({ error: 'Failed to register customer' });
     }
 
-    res.status(201).json({
+    return res.status(201).json({
       message: `Customer ${cardHolderName} has registered`,
       customerId: this.lastID
     });
   });
 });
 
-app.listen(3000, () => {
-  console.log('Server running at http://localhost:3000');
+// ✅ Start the server
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
