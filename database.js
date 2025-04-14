@@ -1,22 +1,28 @@
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./database.db');
+const db = new sqlite3.Database('customers.db');
 
 db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS customer (
-      customerId INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      address TEXT,
-      email TEXT NOT NULL UNIQUE,
-      dateOfBirth TEXT,
-      age INTEGER,
-      cardHolderName TEXT,
-      cardNumber TEXT,
-      expiryDate TEXT,
-      cvv TEXT,
-      timestamp TEXT
+      address TEXT NOT NULL,
+      email TEXT NOT NULL,
+      dateOfBirth TEXT NOT NULL,
+      age INTEGER NOT NULL,
+      cardHolderName TEXT NOT NULL,
+      cardNumber TEXT NOT NULL,
+      expiryDate TEXT NOT NULL,
+      cvv TEXT NOT NULL,
+      timestamp TEXT NOT NULL
     )
-  `);
+  `, (err) => {
+    if (err) {
+      console.error('Error creating table:', err.message);
+    } else {
+      console.log('Customer table is ready.');
+    }
+  });
 });
 
 module.exports = db;
